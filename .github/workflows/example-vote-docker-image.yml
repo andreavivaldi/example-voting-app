@@ -1,0 +1,36 @@
+name: Vote Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Build the Docker image
+      run: docker build . --file vote/Dockerfile --tag ${{ secrets.DOCKER_HUB_USER }}/example-voting-app-vote:scanned
+      
+    - name: Sysdig Secure Inline Scan
+      id: scan
+      uses: sysdiglabs/scan-action@v3
+      with:
+        image-tag: "${{ secrets.DOCKER_HUB_USER }}/example-voting-app-vote:scanned"
+        sysdig-secure-token: ${{ secrets.SYSDIG_TOKEN }}
+        dockerfile-path: ./Dockerfile
+        input-type: docker-daemon
+        run-as-user: root
+        ignore-failed-scan: false
+
+    - name: Docker Hub login
+      run: docker login -u ${{ secrets.DOCKER_HUB_USER }} -p ${{ secrets.DOCKER_HUB_TOKEN }}
+
+    - name: Docker Hub push
+      run: docker push ${{ secrets.DOCKER_HUB_USER }}/example-voting-app-vote:scanned
