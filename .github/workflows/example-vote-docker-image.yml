@@ -24,7 +24,7 @@ jobs:
       with:
         image-tag: "${{ secrets.DOCKER_HUB_USER }}/example-voting-app-vote:scanned"
         sysdig-secure-token: ${{ secrets.SYSDIG_TOKEN }}
-        dockerfile-path: ./Dockerfile
+        dockerfile-path: vote/Dockerfile
         input-type: docker-daemon
         run-as-user: root
         ignore-failed-scan: false
