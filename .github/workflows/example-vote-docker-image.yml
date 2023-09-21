@@ -16,7 +16,9 @@ jobs:
     - uses: actions/checkout@v3
     
     - name: Build the Docker image
-      run: docker build . --file vote/Dockerfile --tag ${{ secrets.DOCKER_HUB_USER }}/example-voting-app-vote:scanned
+      with:
+          context: "vote/"
+      run: docker build . --tag ${{ secrets.DOCKER_HUB_USER }}/example-voting-app-vote:scanned
       
     - name: Sysdig Secure Inline Scan
       id: scan
