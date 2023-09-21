@@ -18,18 +18,26 @@ jobs:
     
     - name: Build the Docker image
       run: cd vote/ && docker build . --tag ${{ secrets.DOCKER_HUB_USER }}/example-voting-app-vote:scanned
+
+    - name: Sysdig Scanner CLI
+      env:
+        SECURE_API_TOKEN: ${{ secrets.SYSDIG_TOKEN }}
+      run: |
+        curl -LO "https://download.sysdig.com/scanning/bin/sysdig-cli-scanner/$(curl -L -s https://download.sysdig.com/scanning/sysdig-cli-scanner/latest_version.txt)/linux/amd64/sysdig-cli-scanner"
+        chmod +x ./sysdig-cli-scanner
+        ./sysdig-cli-scanner --apiurl https://us2.app.sysdig.com ${{ secrets.DOCKER_HUB_USER }}/example-voting-app-vote:scanned
       
-    - name: Sysdig Secure Inline Scan
-      id: scan
-      uses: sysdiglabs/scan-action@v3
-      with:
-        image-tag: ${{ secrets.DOCKER_HUB_USER }}/example-voting-app-vote:scanned
-        sysdig-secure-token: ${{ secrets.SYSDIG_TOKEN }}
-        sysdig-secure-url: https://us2.app.sysdig.com/
-        dockerfile-path: vote/Dockerfile
-        input-type: docker-daemon
-        run-as-user: root
-        ignore-failed-scan: false
+    # - name: Sysdig Secure Inline Scan
+    #   id: scan
+    #   uses: sysdiglabs/scan-action@v3
+    #   with:
+    #     image-tag: ${{ secrets.DOCKER_HUB_USER }}/example-voting-app-vote:scanned
+    #     sysdig-secure-token: ${{ secrets.SYSDIG_TOKEN }}
+    #     sysdig-secure-url: https://us2.app.sysdig.com/
+    #     dockerfile-path: vote/Dockerfile
+    #     input-type: docker-daemon
+    #     run-as-user: root
+    #     ignore-failed-scan: false
 
     - name: Docker Hub login
       run: docker login -u ${{ secrets.DOCKER_HUB_USER }} -p ${{ secrets.DOCKER_HUB_TOKEN }}
