@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    
+
     - uses: actions/checkout@v3
     
     - name: Build the Docker image
@@ -23,8 +23,9 @@ jobs:
       id: scan
       uses: sysdiglabs/scan-action@v3
       with:
-        image-tag: "${{ secrets.DOCKER_HUB_USER }}/example-voting-app-vote:scanned"
+        image-tag: ${{ secrets.DOCKER_HUB_USER }}/example-voting-app-vote:scanned
         sysdig-secure-token: ${{ secrets.SYSDIG_TOKEN }}
+        sysdig-secure-url: https://us2.app.sysdig.com/
         dockerfile-path: vote/Dockerfile
         input-type: docker-daemon
         run-as-user: root
